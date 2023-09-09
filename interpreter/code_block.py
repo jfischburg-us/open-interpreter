@@ -1,3 +1,7 @@
+"""
+This is the CodeBlock module.
+It handles the functionality of code blocks in the interpreter.
+"""
 from rich.live import Live
 from rich.panel import Panel
 from rich.box import MINIMAL
@@ -25,6 +29,9 @@ class CodeBlock:
         self.live.start()
 
     def update_from_message(self, message):
+        """
+        Update the code block from a message.
+        """
         if (
             "function_call" in message
             and "parsed_arguments" in message["function_call"]
@@ -39,11 +46,17 @@ class CodeBlock:
                     self.refresh()
 
     def end(self):
+        """
+        End the code block.
+        """
         self.refresh(cursor=False)
         # Destroys live display
         self.live.stop()
 
     def refresh(self, cursor=True):
+        """
+        Refresh the code block.
+        """
         # Get code, return if there is none
         code = self.code
         if not code:

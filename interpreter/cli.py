@@ -1,5 +1,5 @@
+"""This is the CLI module. It handles the command line interface functionality."""
 import argparse
-import inquirer
 
 
 def cli(interpreter):
