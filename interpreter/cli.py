@@ -1,4 +1,9 @@
 """This is the CLI module. It handles the command line interface functionality."""
+import logger
+logger.log("error", "This is an error message.")
+logger.log("user_input", "This is a user input message.")
+logger.log("system", "This is a system message.")
+logger.log("agent", "This is an agent message.")
 import argparse
 
 
