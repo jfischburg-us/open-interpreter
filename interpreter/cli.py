@@ -1,5 +1,9 @@
-"""This is the CLI module. It handles the command line interface functionality."""
-import logger
+"""
+This is the CLI module.
+It handles the command line interface functionality.
+"""
+from . import logger
+
 logger.log("error", "This is an error message.")
 logger.log("user_input", "This is a user input message.")
 logger.log("system", "This is a system message.")
