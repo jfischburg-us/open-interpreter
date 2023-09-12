@@ -1,0 +1,53 @@
+[
+  {
+    "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/microsoft.aks-20230907225030/operations/93F4410DE33BBF27",
+    "operationId": "93F4410DE33BBF27",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Running",
+      "timestamp": "2023-09-08T02:52:58.5502488Z",
+      "duration": "PT6.4622414S",
+      "trackingId": "da5b5171-aded-4a1d-889e-e5a853c88efe",
+      "statusCode": "Created",
+      "targetResource": {
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+        "resourceType": "Microsoft.ContainerService/managedClusters",
+        "resourceName": "GoPT"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/microsoft.aks-20230907225030/operations/001304CF8EF6D262",
+    "operationId": "001304CF8EF6D262",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Running",
+      "timestamp": "2023-09-08T02:52:52.913598Z",
+      "duration": "PT0.8255906S",
+      "trackingId": "4c47ca66-9bd0-4542-ad2e-8867d70f5ad4",
+      "statusCode": "Created",
+      "targetResource": {
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/DefaultResourceGroup-EUS2/providers/Microsoft.Resources/deployments/SolutionDeployment-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "SolutionDeployment-20230907225244"
+      }
+    }
+  },
+  {
+    "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/microsoft.aks-20230907225030/operations/1A97D0CAFEDE4CFC",
+    "operationId": "1A97D0CAFEDE4CFC",
+    "properties": {
+      "provisioningOperation": "Create",
+      "provisioningState": "Running",
+      "timestamp": "2023-09-08T02:52:52.8415879Z",
+      "duration": "PT0.7535805S",
+      "trackingId": "7d031084-5226-4dd0-8611-b04646118dcb",
+      "statusCode": "Created",
+      "targetResource": {
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AcrDeployment-22fc4278-71f4-4d7b-9a74-d49f93a050af",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "AcrDeployment-22fc4278-71f4-4d7b-9a74-d49f93a050af"
+      }
+    }
+  }
+]

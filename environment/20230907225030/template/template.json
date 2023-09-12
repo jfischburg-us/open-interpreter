@@ -1,0 +1,1261 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The location of AKS resource."
+            }
+        },
+        "dnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "osDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 0,
+            "metadata": {
+                "description": "Disk size (in GiB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+            },
+            "minValue": 0,
+            "maxValue": 1023
+        },
+        "kubernetesVersion": {
+            "type": "string",
+            "defaultValue": "1.7.7",
+            "metadata": {
+                "description": "The version of Kubernetes."
+            }
+        },
+        "networkPlugin": {
+            "type": "string",
+            "allowedValues": [
+                "azure",
+                "kubenet"
+            ],
+            "metadata": {
+                "description": "Network plugin used for building Kubernetes network."
+            }
+        },
+        "enableRBAC": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off of RBAC."
+            }
+        },
+        "vmssNodePool": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Boolean flag to turn on and off of virtual machine scale sets"
+            }
+        },
+        "windowsProfile": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Boolean flag to turn on and off of virtual machine scale sets"
+            }
+        },
+        "nodeResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource group containing agent pool nodes."
+            }
+        },
+        "upgradeChannel": {
+            "metadata": {
+                "description": "Auto upgrade channel for a managed cluster."
+            },
+            "type": "string",
+            "allowedValues": [
+                "none",
+                "patch",
+                "rapid",
+                "stable",
+                "node-image"
+            ]
+        },
+        "adminGroupObjectIDs": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "An array of AAD group object ids to give administrative access."
+            }
+        },
+        "azureRbac": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Enable or disable Azure RBAC."
+            }
+        },
+        "disableLocalAccounts": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Enable or disable local accounts."
+            }
+        },
+        "enablePrivateCluster": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Enable private network access to the Kubernetes cluster."
+            }
+        },
+        "enableAzurePolicy": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Boolean flag to turn on and off Azure Policy addon."
+            }
+        },
+        "enableSecretStoreCSIDriver": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Boolean flag to turn on and off secret store CSI driver."
+            }
+        },
+        "enableOmsAgent": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean flag to turn on and off omsagent addon."
+            }
+        },
+        "workspaceRegion": {
+            "type": "string",
+            "defaultValue": "East US",
+            "metadata": {
+                "description": "Specify the region for your OMS workspace."
+            }
+        },
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the name of the OMS workspace."
+            }
+        },
+        "omsWorkspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the resource id of the OMS workspace."
+            }
+        },
+        "omsSku": {
+            "type": "string",
+            "defaultValue": "standalone",
+            "allowedValues": [
+                "free",
+                "standalone",
+                "pernode"
+            ],
+            "metadata": {
+                "description": "Select the SKU for your workspace."
+            }
+        },
+        "acrName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the name of the Azure Container Registry."
+            }
+        },
+        "acrResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource group the container registry is associated with."
+            }
+        },
+        "guidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the container registry service. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
+        },
+        "networkPolicy": {
+            "type": "string",
+            "metadata": {
+                "description": "Network policy used for building Kubernetes network."
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "SolutionDeployment-20230907224944",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[split(parameters('omsWorkspaceId'),'/')[4]]",
+            "subscriptionId": "[split(parameters('omsWorkspaceId'),'/')[2]]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "apiVersion": "2015-11-01-preview",
+                            "type": "Microsoft.OperationsManagement/solutions",
+                            "location": "[parameters('workspaceRegion')]",
+                            "name": "[concat('ContainerInsights', '(', split(parameters('omsWorkspaceId'),'/')[8], ')')]",
+                            "properties": {
+                                "workspaceResourceId": "[parameters('omsWorkspaceId')]"
+                            },
+                            "plan": {
+                                "name": "[concat('ContainerInsights', '(', split(parameters('omsWorkspaceId'),'/')[8], ')')]",
+                                "product": "[concat('OMSGallery/', 'ContainerInsights')]",
+                                "promotionCode": "",
+                                "publisher": "Microsoft"
+                            }
+                        }
+                    ]
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "ConnectAKStoACR-22fc4278-71f4-4d7b-9a74-d49f93a0505b",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "resourceGroup": "[parameters('acrResourceGroup')]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'AcrDeployment-22fc4278-71f4-4d7b-9a74-d49f93a0505c')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2018-09-01-preview",
+                            "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
+                            "name": "[concat(parameters('acrName'), '/Microsoft.Authorization/', parameters('guidValue'))]",
+                            "properties": {
+                                "principalId": "[reference(parameters('resourceName'), '2023-04-01').identityProfile.kubeletidentity.objectId]",
+                                "principalType": "ServicePrincipal",
+                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
+                                "scope": "[resourceId(parameters('acrResourceGroup'),'Microsoft.ContainerRegistry/registries/', parameters('acrName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "AcrDeployment-22fc4278-71f4-4d7b-9a74-d49f93a0505c",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.ContainerRegistry/registries",
+                            "apiVersion": "2019-05-01",
+                            "name": "GoPT1",
+                            "location": "eastus2",
+                            "sku": {
+                                "name": "Standard"
+                            },
+                            "properties": {
+                                "adminUserEnabled": false
+                            },
+                            "tags": {}
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "InsightsMetricAlertsDepl-22fc4278-71f4-4d7b-9a74-d49f93a0505e",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "microsoft.insights/metricAlerts",
+                            "apiVersion": "2018-03-01",
+                            "name": "CPU Usage Percentage - GoPT",
+                            "location": "Global",
+                            "properties": {
+                                "severity": 3,
+                                "enabled": true,
+                                "scopes": [
+                                    "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT"
+                                ],
+                                "evaluationFrequency": "PT5M",
+                                "windowSize": "PT5M",
+                                "criteria": {
+                                    "allOf": [
+                                        {
+                                            "name": "Metric1",
+                                            "metricName": "node_cpu_usage_percentage",
+                                            "metricNamespace": "Microsoft.ContainerService/managedClusters",
+                                            "operator": "GreaterThan",
+                                            "timeAggregation": "Average",
+                                            "criterionType": "StaticThresholdCriterion",
+                                            "threshold": 95
+                                        }
+                                    ],
+                                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                                },
+                                "targetResourceType": "Microsoft.ContainerService/managedClusters",
+                                "actions": [
+                                    {
+                                        "actionGroupId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/AI-Research/providers/microsoft.insights/actiongroups/RecommendedAlertRules-AG-1",
+                                        "webhookProperties": {}
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "microsoft.insights/metricAlerts",
+                            "apiVersion": "2018-03-01",
+                            "name": "Memory Working Set Percentage - GoPT",
+                            "location": "Global",
+                            "properties": {
+                                "severity": 3,
+                                "enabled": true,
+                                "scopes": [
+                                    "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT"
+                                ],
+                                "evaluationFrequency": "PT5M",
+                                "windowSize": "PT5M",
+                                "criteria": {
+                                    "allOf": [
+                                        {
+                                            "name": "Metric1",
+                                            "metricName": "node_memory_working_set_percentage",
+                                            "metricNamespace": "Microsoft.ContainerService/managedClusters",
+                                            "operator": "GreaterThan",
+                                            "timeAggregation": "Average",
+                                            "criterionType": "StaticThresholdCriterion",
+                                            "threshold": 100
+                                        }
+                                    ],
+                                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                                },
+                                "targetResourceType": "Microsoft.ContainerService/managedClusters",
+                                "actions": [
+                                    {
+                                        "actionGroupId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/AI-Research/providers/microsoft.insights/actiongroups/RecommendedAlertRules-AG-1",
+                                        "webhookProperties": {}
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2023-04-01",
+            "dependsOn": [],
+            "type": "Microsoft.ContainerService/managedClusters",
+            "location": "[parameters('location')]",
+            "name": "[parameters('resourceName')]",
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "nodeResourceGroup": "[parameters('nodeResourceGroup')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                        "count": 2,
+                        "enableAutoScaling": true,
+                        "minCount": 2,
+                        "maxCount": 5,
+                        "vmSize": "Standard_D8ds_v5",
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks",
+                        "type": "VirtualMachineScaleSets",
+                        "mode": "System",
+                        "maxPods": 110,
+                        "availabilityZones": [
+                            "1",
+                            "2",
+                            "3"
+                        ],
+                        "nodeTaints": [
+                            "CriticalAddonsOnly=true:NoSchedule"
+                        ],
+                        "enableNodePublicIP": false,
+                        "tags": {}
+                    },
+                    {
+                        "name": "userpool",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                        "count": 2,
+                        "enableAutoScaling": true,
+                        "minCount": 2,
+                        "maxCount": 100,
+                        "vmSize": "Standard_D8ds_v5",
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks",
+                        "type": "VirtualMachineScaleSets",
+                        "mode": "User",
+                        "maxPods": 110,
+                        "availabilityZones": [
+                            "1",
+                            "2",
+                            "3"
+                        ],
+                        "nodeTaints": [],
+                        "enableNodePublicIP": false,
+                        "tags": {}
+                    }
+                ],
+                "networkProfile": {
+                    "loadBalancerSku": "standard",
+                    "networkPlugin": "[parameters('networkPlugin')]",
+                    "networkPolicy": "[parameters('networkPolicy')]"
+                },
+                "autoUpgradeProfile": {
+                    "upgradeChannel": "[parameters('upgradeChannel')]"
+                },
+                "disableLocalAccounts": "[parameters('disableLocalAccounts')]",
+                "apiServerAccessProfile": {
+                    "enablePrivateCluster": "[parameters('enablePrivateCluster')]"
+                },
+                "addonProfiles": {
+                    "azurepolicy": {
+                        "enabled": "[parameters('enableAzurePolicy')]"
+                    },
+                    "azureKeyvaultSecretsProvider": {
+                        "enabled": "[parameters('enableSecretStoreCSIDriver')]",
+                        "config": {
+                            "enableSecretRotation": "false",
+                            "rotationPollInterval": "2m"
+                        }
+                    },
+                    "omsAgent": {
+                        "enabled": "[parameters('enableOmsAgent')]",
+                        "config": {
+                            "logAnalyticsWorkspaceResourceID": "[parameters('omsWorkspaceId')]"
+                        }
+                    }
+                }
+            },
+            "tags": {},
+            "sku": {
+                "name": "Base",
+                "tier": "Standard"
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        },
+        {
+            "name": "CreatePromDCE-20230907224944",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "MSProm-eastus2-GoPT",
+                            "type": "Microsoft.Insights/dataCollectionEndpoints",
+                            "location": "eastus2",
+                            "kind": "Linux",
+                            "apiVersion": "2022-06-01",
+                            "properties": {}
+                        }
+                    ]
+                }
+            },
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "CreatePromDCR-20230907224944",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Insights/dataCollectionRules",
+                            "location": "eastus2",
+                            "name": "MSProm-eastus2-GoPT",
+                            "apiVersion": "2022-06-01",
+                            "properties": {
+                                "dataCollectionEndpointId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Insights/dataCollectionEndpoints/MSProm-eastus2-GoPT",
+                                "dataSources": {
+                                    "prometheusForwarder": [
+                                        {
+                                            "name": "PrometheusDataSource",
+                                            "streams": [
+                                                "Microsoft-PrometheusMetrics"
+                                            ],
+                                            "labelIncludeFilter": {}
+                                        }
+                                    ]
+                                },
+                                "destinations": {
+                                    "monitoringAccounts": [
+                                        {
+                                            "accountResourceId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2",
+                                            "name": "MonitoringAccount1"
+                                        }
+                                    ]
+                                },
+                                "dataFlows": [
+                                    {
+                                        "destinations": [
+                                            "MonitoringAccount1"
+                                        ],
+                                        "streams": [
+                                            "Microsoft-PrometheusMetrics"
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreatePromDCE-20230907224944",
+                "Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907224944"
+            ],
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "CreatePromDCRA-20230907224944",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreatePromDCR-20230907224944"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+                            "name": "ContainerInsightsMetricsExtension",
+                            "apiVersion": "2022-06-01",
+                            "properties": {
+                                "description": "Association of data collection rule. Deleting this association will break the prometheus metrics data collection for this AKS Cluster.",
+                                "dataCollectionRuleId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/Microsoft.Insights/dataCollectionRules/MSProm-eastus2-GoPT"
+                            },
+                            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/gopt/providers/microsoft.containerservice/managedclusters/gopt/providers/Microsoft.Insights/dataCollectionRuleAssociations/ContainerInsightsMetricsExtension",
+                            "scope": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/gopt/providers/microsoft.containerservice/managedclusters/gopt"
+                        }
+                    ]
+                }
+            },
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "CreatePromRecordingRules-20230907224944",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "location": "eastus2",
+                            "name": "NodeRecordingRulesRuleGroup-GoPT",
+                            "type": "Microsoft.AlertsManagement/prometheusRuleGroups",
+                            "properties": {
+                                "description": "Node Recording Rules RuleGroup",
+                                "enabled": true,
+                                "scopes": [
+                                    "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2"
+                                ],
+                                "interval": "PT1M",
+                                "clusterName": "GoPT",
+                                "rules": [
+                                    {
+                                        "record": "instance:node_num_cpu:sum",
+                                        "expression": "count without (cpu, mode) (  node_cpu_seconds_total{job=\"node\",mode=\"idle\"})"
+                                    },
+                                    {
+                                        "record": "instance:node_cpu_utilisation:rate5m",
+                                        "expression": "1 - avg without (cpu) (  sum without (mode) (rate(node_cpu_seconds_total{job=\"node\", mode=~\"idle|iowait|steal\"}[5m])))"
+                                    },
+                                    {
+                                        "record": "instance:node_load1_per_cpu:ratio",
+                                        "expression": "(  node_load1{job=\"node\"}/  instance:node_num_cpu:sum{job=\"node\"})"
+                                    },
+                                    {
+                                        "record": "instance:node_memory_utilisation:ratio",
+                                        "expression": "1 - (  (    node_memory_MemAvailable_bytes{job=\"node\"}    or    (      node_memory_Buffers_bytes{job=\"node\"}      +      node_memory_Cached_bytes{job=\"node\"}      +      node_memory_MemFree_bytes{job=\"node\"}      +      node_memory_Slab_bytes{job=\"node\"}    )  )/  node_memory_MemTotal_bytes{job=\"node\"})"
+                                    },
+                                    {
+                                        "record": "instance:node_vmstat_pgmajfault:rate5m",
+                                        "expression": "rate(node_vmstat_pgmajfault{job=\"node\"}[5m])"
+                                    },
+                                    {
+                                        "record": "instance_device:node_disk_io_time_seconds:rate5m",
+                                        "expression": "rate(node_disk_io_time_seconds_total{job=\"node\", device!=\"\"}[5m])"
+                                    },
+                                    {
+                                        "record": "instance_device:node_disk_io_time_weighted_seconds:rate5m",
+                                        "expression": "rate(node_disk_io_time_weighted_seconds_total{job=\"node\", device!=\"\"}[5m])"
+                                    },
+                                    {
+                                        "record": "instance:node_network_receive_bytes_excluding_lo:rate5m",
+                                        "expression": "sum without (device) (  rate(node_network_receive_bytes_total{job=\"node\", device!=\"lo\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "instance:node_network_transmit_bytes_excluding_lo:rate5m",
+                                        "expression": "sum without (device) (  rate(node_network_transmit_bytes_total{job=\"node\", device!=\"lo\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "instance:node_network_receive_drop_excluding_lo:rate5m",
+                                        "expression": "sum without (device) (  rate(node_network_receive_drop_total{job=\"node\", device!=\"lo\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "instance:node_network_transmit_drop_excluding_lo:rate5m",
+                                        "expression": "sum without (device) (  rate(node_network_transmit_drop_total{job=\"node\", device!=\"lo\"}[5m]))"
+                                    }
+                                ]
+                            },
+                            "apiVersion": "2023-03-01"
+                        },
+                        {
+                            "location": "eastus2",
+                            "name": "KubernetesRecordingRulesRuleGroup-GoPT",
+                            "type": "Microsoft.AlertsManagement/prometheusRuleGroups",
+                            "properties": {
+                                "description": "Kubernetes Recording Rules RuleGroup",
+                                "enabled": true,
+                                "scopes": [
+                                    "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2"
+                                ],
+                                "interval": "PT1M",
+                                "clusterName": "GoPT",
+                                "rules": [
+                                    {
+                                        "record": "node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate",
+                                        "expression": "sum by (cluster, namespace, pod, container) (  irate(container_cpu_usage_seconds_total{job=\"cadvisor\", image!=\"\"}[5m])) * on (cluster, namespace, pod) group_left(node) topk by (cluster, namespace, pod) (  1, max by(cluster, namespace, pod, node) (kube_pod_info{node!=\"\"}))"
+                                    },
+                                    {
+                                        "record": "node_namespace_pod_container:container_memory_working_set_bytes",
+                                        "expression": "container_memory_working_set_bytes{job=\"cadvisor\", image!=\"\"}* on (namespace, pod) group_left(node) topk by(namespace, pod) (1,  max by(namespace, pod, node) (kube_pod_info{node!=\"\"}))"
+                                    },
+                                    {
+                                        "record": "node_namespace_pod_container:container_memory_rss",
+                                        "expression": "container_memory_rss{job=\"cadvisor\", image!=\"\"}* on (namespace, pod) group_left(node) topk by(namespace, pod) (1,  max by(namespace, pod, node) (kube_pod_info{node!=\"\"}))"
+                                    },
+                                    {
+                                        "record": "node_namespace_pod_container:container_memory_cache",
+                                        "expression": "container_memory_cache{job=\"cadvisor\", image!=\"\"}* on (namespace, pod) group_left(node) topk by(namespace, pod) (1,  max by(namespace, pod, node) (kube_pod_info{node!=\"\"}))"
+                                    },
+                                    {
+                                        "record": "node_namespace_pod_container:container_memory_swap",
+                                        "expression": "container_memory_swap{job=\"cadvisor\", image!=\"\"}* on (namespace, pod) group_left(node) topk by(namespace, pod) (1,  max by(namespace, pod, node) (kube_pod_info{node!=\"\"}))"
+                                    },
+                                    {
+                                        "record": "cluster:namespace:pod_memory:active:kube_pod_container_resource_requests",
+                                        "expression": "kube_pod_container_resource_requests{resource=\"memory\",job=\"kube-state-metrics\"}  * on (namespace, pod, cluster)group_left() max by (namespace, pod, cluster) (  (kube_pod_status_phase{phase=~\"Pending|Running\"} == 1))"
+                                    },
+                                    {
+                                        "record": "namespace_memory:kube_pod_container_resource_requests:sum",
+                                        "expression": "sum by (namespace, cluster) (    sum by (namespace, pod, cluster) (        max by (namespace, pod, container, cluster) (          kube_pod_container_resource_requests{resource=\"memory\",job=\"kube-state-metrics\"}        ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (          kube_pod_status_phase{phase=~\"Pending|Running\"} == 1        )    ))"
+                                    },
+                                    {
+                                        "record": "cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests",
+                                        "expression": "kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"}  * on (namespace, pod, cluster)group_left() max by (namespace, pod, cluster) (  (kube_pod_status_phase{phase=~\"Pending|Running\"} == 1))"
+                                    },
+                                    {
+                                        "record": "namespace_cpu:kube_pod_container_resource_requests:sum",
+                                        "expression": "sum by (namespace, cluster) (    sum by (namespace, pod, cluster) (        max by (namespace, pod, container, cluster) (          kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"}        ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (          kube_pod_status_phase{phase=~\"Pending|Running\"} == 1        )    ))"
+                                    },
+                                    {
+                                        "record": "cluster:namespace:pod_memory:active:kube_pod_container_resource_limits",
+                                        "expression": "kube_pod_container_resource_limits{resource=\"memory\",job=\"kube-state-metrics\"}  * on (namespace, pod, cluster)group_left() max by (namespace, pod, cluster) (  (kube_pod_status_phase{phase=~\"Pending|Running\"} == 1))"
+                                    },
+                                    {
+                                        "record": "namespace_memory:kube_pod_container_resource_limits:sum",
+                                        "expression": "sum by (namespace, cluster) (    sum by (namespace, pod, cluster) (        max by (namespace, pod, container, cluster) (          kube_pod_container_resource_limits{resource=\"memory\",job=\"kube-state-metrics\"}        ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (          kube_pod_status_phase{phase=~\"Pending|Running\"} == 1        )    ))"
+                                    },
+                                    {
+                                        "record": "cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits",
+                                        "expression": "kube_pod_container_resource_limits{resource=\"cpu\",job=\"kube-state-metrics\"}  * on (namespace, pod, cluster)group_left() max by (namespace, pod, cluster) ( (kube_pod_status_phase{phase=~\"Pending|Running\"} == 1) )"
+                                    },
+                                    {
+                                        "record": "namespace_cpu:kube_pod_container_resource_limits:sum",
+                                        "expression": "sum by (namespace, cluster) (    sum by (namespace, pod, cluster) (        max by (namespace, pod, container, cluster) (          kube_pod_container_resource_limits{resource=\"cpu\",job=\"kube-state-metrics\"}        ) * on(namespace, pod, cluster) group_left() max by (namespace, pod, cluster) (          kube_pod_status_phase{phase=~\"Pending|Running\"} == 1        )    ))"
+                                    },
+                                    {
+                                        "record": "namespace_workload_pod:kube_pod_owner:relabel",
+                                        "expression": "max by (cluster, namespace, workload, pod) (  label_replace(    label_replace(      kube_pod_owner{job=\"kube-state-metrics\", owner_kind=\"ReplicaSet\"},      \"replicaset\", \"$1\", \"owner_name\", \"(.*)\"    ) * on(replicaset, namespace) group_left(owner_name) topk by(replicaset, namespace) (      1, max by (replicaset, namespace, owner_name) (        kube_replicaset_owner{job=\"kube-state-metrics\"}      )    ),    \"workload\", \"$1\", \"owner_name\", \"(.*)\"  ))",
+                                        "labels": {
+                                            "workload_type": "deployment"
+                                        }
+                                    },
+                                    {
+                                        "record": "namespace_workload_pod:kube_pod_owner:relabel",
+                                        "expression": "max by (cluster, namespace, workload, pod) (  label_replace(    kube_pod_owner{job=\"kube-state-metrics\", owner_kind=\"DaemonSet\"},    \"workload\", \"$1\", \"owner_name\", \"(.*)\"  ))",
+                                        "labels": {
+                                            "workload_type": "daemonset"
+                                        }
+                                    },
+                                    {
+                                        "record": "namespace_workload_pod:kube_pod_owner:relabel",
+                                        "expression": "max by (cluster, namespace, workload, pod) (  label_replace(    kube_pod_owner{job=\"kube-state-metrics\", owner_kind=\"StatefulSet\"},    \"workload\", \"$1\", \"owner_name\", \"(.*)\"  ))",
+                                        "labels": {
+                                            "workload_type": "statefulset"
+                                        }
+                                    },
+                                    {
+                                        "record": "namespace_workload_pod:kube_pod_owner:relabel",
+                                        "expression": "max by (cluster, namespace, workload, pod) (  label_replace(    kube_pod_owner{job=\"kube-state-metrics\", owner_kind=\"Job\"},    \"workload\", \"$1\", \"owner_name\", \"(.*)\"  ))",
+                                        "labels": {
+                                            "workload_type": "job"
+                                        }
+                                    },
+                                    {
+                                        "record": ":node_memory_MemAvailable_bytes:sum",
+                                        "expression": "sum(  node_memory_MemAvailable_bytes{job=\"node\"} or  (    node_memory_Buffers_bytes{job=\"node\"} +    node_memory_Cached_bytes{job=\"node\"} +    node_memory_MemFree_bytes{job=\"node\"} +    node_memory_Slab_bytes{job=\"node\"}  )) by (cluster)"
+                                    },
+                                    {
+                                        "record": "cluster:node_cpu:ratio_rate5m",
+                                        "expression": "sum(rate(node_cpu_seconds_total{job=\"node\",mode!=\"idle\",mode!=\"iowait\",mode!=\"steal\"}[5m])) by (cluster) /count(sum(node_cpu_seconds_total{job=\"node\"}) by (cluster, instance, cpu)) by (cluster)"
+                                    }
+                                ]
+                            },
+                            "apiVersion": "2023-03-01"
+                        },
+                        {
+                            "location": "eastus2",
+                            "name": "NodeRecordingRulesRuleGroup-Win-GoPT",
+                            "type": "Microsoft.AlertsManagement/prometheusRuleGroups",
+                            "properties": {
+                                "description": "Node Recording Rules RuleGroup for Windows",
+                                "enabled": false,
+                                "scopes": [
+                                    "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2"
+                                ],
+                                "interval": "PT1M",
+                                "clusterName": "GoPT",
+                                "rules": [
+                                    {
+                                        "record": "node:windows_node:sum",
+                                        "expression": "count (windows_system_system_up_time{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": "node:windows_node_num_cpu:sum",
+                                        "expression": "count by (instance) (sum by (instance, core) (windows_cpu_time_total{job=\"windows-exporter\"}))"
+                                    },
+                                    {
+                                        "record": ":windows_node_cpu_utilisation:avg5m",
+                                        "expression": "1 - avg(rate(windows_cpu_time_total{job=\"windows-exporter\",mode=\"idle\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "node:windows_node_cpu_utilisation:avg5m",
+                                        "expression": "1 - avg by (instance) (rate(windows_cpu_time_total{job=\"windows-exporter\",mode=\"idle\"}[5m]))"
+                                    },
+                                    {
+                                        "record": ":windows_node_memory_utilisation:",
+                                        "expression": "1 -sum(windows_memory_available_bytes{job=\"windows-exporter\"})/sum(windows_os_visible_memory_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": ":windows_node_memory_MemFreeCached_bytes:sum",
+                                        "expression": "sum(windows_memory_available_bytes{job=\"windows-exporter\"} + windows_memory_cache_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": "node:windows_node_memory_totalCached_bytes:sum",
+                                        "expression": "(windows_memory_cache_bytes{job=\"windows-exporter\"} + windows_memory_modified_page_list_bytes{job=\"windows-exporter\"} + windows_memory_standby_cache_core_bytes{job=\"windows-exporter\"} + windows_memory_standby_cache_normal_priority_bytes{job=\"windows-exporter\"} + windows_memory_standby_cache_reserve_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": ":windows_node_memory_MemTotal_bytes:sum",
+                                        "expression": "sum(windows_os_visible_memory_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": "node:windows_node_memory_bytes_available:sum",
+                                        "expression": "sum by (instance) ((windows_memory_available_bytes{job=\"windows-exporter\"}))"
+                                    },
+                                    {
+                                        "record": "node:windows_node_memory_bytes_total:sum",
+                                        "expression": "sum by (instance) (windows_os_visible_memory_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": "node:windows_node_memory_utilisation:ratio",
+                                        "expression": "(node:windows_node_memory_bytes_total:sum - node:windows_node_memory_bytes_available:sum) / scalar(sum(node:windows_node_memory_bytes_total:sum))"
+                                    },
+                                    {
+                                        "record": "node:windows_node_memory_utilisation:",
+                                        "expression": "1 - (node:windows_node_memory_bytes_available:sum / node:windows_node_memory_bytes_total:sum)"
+                                    },
+                                    {
+                                        "record": "node:windows_node_memory_swap_io_pages:irate",
+                                        "expression": "irate(windows_memory_swap_page_operations_total{job=\"windows-exporter\"}[5m])"
+                                    },
+                                    {
+                                        "record": ":windows_node_disk_utilisation:avg_irate",
+                                        "expression": "avg(irate(windows_logical_disk_read_seconds_total{job=\"windows-exporter\"}[5m]) + irate(windows_logical_disk_write_seconds_total{job=\"windows-exporter\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "node:windows_node_disk_utilisation:avg_irate",
+                                        "expression": "avg by (instance) ((irate(windows_logical_disk_read_seconds_total{job=\"windows-exporter\"}[5m]) + irate(windows_logical_disk_write_seconds_total{job=\"windows-exporter\"}[5m])))"
+                                    }
+                                ]
+                            },
+                            "apiVersion": "2023-03-01"
+                        },
+                        {
+                            "location": "eastus2",
+                            "name": "NodeAndKubernetesRecordingRulesRuleGroup-Win-GoPT",
+                            "type": "Microsoft.AlertsManagement/prometheusRuleGroups",
+                            "properties": {
+                                "description": "Node and Kubernetes Recording Rules RuleGroup for Windows",
+                                "enabled": false,
+                                "scopes": [
+                                    "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2"
+                                ],
+                                "interval": "PT1M",
+                                "clusterName": "GoPT",
+                                "rules": [
+                                    {
+                                        "record": "node:windows_node_filesystem_usage:",
+                                        "expression": "max by (instance,volume)((windows_logical_disk_size_bytes{job=\"windows-exporter\"} - windows_logical_disk_free_bytes{job=\"windows-exporter\"}) / windows_logical_disk_size_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": "node:windows_node_filesystem_avail:",
+                                        "expression": "max by (instance, volume) (windows_logical_disk_free_bytes{job=\"windows-exporter\"} / windows_logical_disk_size_bytes{job=\"windows-exporter\"})"
+                                    },
+                                    {
+                                        "record": ":windows_node_net_utilisation:sum_irate",
+                                        "expression": "sum(irate(windows_net_bytes_total{job=\"windows-exporter\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "node:windows_node_net_utilisation:sum_irate",
+                                        "expression": "sum by (instance) ((irate(windows_net_bytes_total{job=\"windows-exporter\"}[5m])))"
+                                    },
+                                    {
+                                        "record": ":windows_node_net_saturation:sum_irate",
+                                        "expression": "sum(irate(windows_net_packets_received_discarded_total{job=\"windows-exporter\"}[5m])) + sum(irate(windows_net_packets_outbound_discarded_total{job=\"windows-exporter\"}[5m]))"
+                                    },
+                                    {
+                                        "record": "node:windows_node_net_saturation:sum_irate",
+                                        "expression": "sum by (instance) ((irate(windows_net_packets_received_discarded_total{job=\"windows-exporter\"}[5m]) + irate(windows_net_packets_outbound_discarded_total{job=\"windows-exporter\"}[5m])))"
+                                    },
+                                    {
+                                        "record": "windows_pod_container_available",
+                                        "expression": "windows_container_available{job=\"windows-exporter\", container_id != \"\"} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{job=\"kube-state-metrics\", container_id != \"\"}) by(container, container_id, pod, namespace)"
+                                    },
+                                    {
+                                        "record": "windows_container_total_runtime",
+                                        "expression": "windows_container_cpu_usage_seconds_total{job=\"windows-exporter\", container_id != \"\"} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{job=\"kube-state-metrics\", container_id != \"\"}) by(container, container_id, pod, namespace)"
+                                    },
+                                    {
+                                        "record": "windows_container_memory_usage",
+                                        "expression": "windows_container_memory_usage_commit_bytes{job=\"windows-exporter\", container_id != \"\"} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{job=\"kube-state-metrics\", container_id != \"\"}) by(container, container_id, pod, namespace)"
+                                    },
+                                    {
+                                        "record": "windows_container_private_working_set_usage",
+                                        "expression": "windows_container_memory_usage_private_working_set_bytes{job=\"windows-exporter\", container_id != \"\"} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{job=\"kube-state-metrics\", container_id != \"\"}) by(container, container_id, pod, namespace)"
+                                    },
+                                    {
+                                        "record": "windows_container_network_received_bytes_total",
+                                        "expression": "windows_container_network_receive_bytes_total{job=\"windows-exporter\", container_id != \"\"} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{job=\"kube-state-metrics\", container_id != \"\"}) by(container, container_id, pod, namespace)"
+                                    },
+                                    {
+                                        "record": "windows_container_network_transmitted_bytes_total",
+                                        "expression": "windows_container_network_transmit_bytes_total{job=\"windows-exporter\", container_id != \"\"} * on(container_id) group_left(container, pod, namespace) max(kube_pod_container_info{job=\"kube-state-metrics\", container_id != \"\"}) by(container, container_id, pod, namespace)"
+                                    },
+                                    {
+                                        "record": "kube_pod_windows_container_resource_memory_request",
+                                        "expression": "max by (namespace, pod, container) (kube_pod_container_resource_requests{resource=\"memory\",job=\"kube-state-metrics\"}) * on(container,pod,namespace) (windows_pod_container_available)"
+                                    },
+                                    {
+                                        "record": "kube_pod_windows_container_resource_memory_limit",
+                                        "expression": "kube_pod_container_resource_limits{resource=\"memory\",job=\"kube-state-metrics\"} * on(container,pod,namespace) (windows_pod_container_available)"
+                                    },
+                                    {
+                                        "record": "kube_pod_windows_container_resource_cpu_cores_request",
+                                        "expression": "max by (namespace, pod, container) ( kube_pod_container_resource_requests{resource=\"cpu\",job=\"kube-state-metrics\"}) * on(container,pod,namespace) (windows_pod_container_available)"
+                                    },
+                                    {
+                                        "record": "kube_pod_windows_container_resource_cpu_cores_limit",
+                                        "expression": "kube_pod_container_resource_limits{resource=\"cpu\",job=\"kube-state-metrics\"} * on(container,pod,namespace) (windows_pod_container_available)"
+                                    },
+                                    {
+                                        "record": "namespace_pod_container:windows_container_cpu_usage_seconds_total:sum_rate",
+                                        "expression": "sum by (namespace, pod, container) (rate(windows_container_total_runtime{}[5m]))"
+                                    }
+                                ]
+                            },
+                            "apiVersion": "2023-03-01"
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))]",
+                "Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907224944"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "CreateAzureMonitorWorkspace-20230907224944",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreatePromDCE-20230907224944"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "microsoft.monitor/accounts",
+                            "name": "defaultazuremonitorworkspace-eus2",
+                            "location": "eastus2",
+                            "properties": {},
+                            "apiVersion": "2023-04-03"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "name": "CreateGrafanaWorkspace-20230907224944",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "microsoft.dashboard/grafana",
+                            "name": "grafana-20230907224140",
+                            "location": "eastus2",
+                            "identity": {
+                                "type": "SystemAssigned"
+                            },
+                            "properties": {},
+                            "apiVersion": "2022-08-01"
+                        }
+                    ],
+                    "outputs": {
+                        "msiPrincipalId": {
+                            "type": "string",
+                            "value": "[reference(resourceId('microsoft.dashboard/grafana', 'grafana-20230907224140'), '2022-08-01', 'Full').identity.principalId]"
+                        }
+                    }
+                },
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "ClusterMonitoringMetricPulisherRoleAssignmentDepl-20230907224944",
+            "apiVersion": "2019-05-01",
+            "resourceGroup": "GoPT",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))]",
+                "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.ContainerService/managedClusters/providers/roleAssignments",
+                            "apiVersion": "2018-09-01-preview",
+                            "name": "GoPT/Microsoft.Authorization/a5f203c0-1e98-4543-8f5e-62f788b0d940",
+                            "properties": {
+                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '3913510d-42f4-4e42-8a64-420c390055eb')]",
+                                "principalId": "[reference(parameters('resourceName')).addonProfiles.omsAgent.identity.objectId]",
+                                "principalType": "ServicePrincipal",
+                                "scope": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "AddAdministratorRoleForGrafana-20230907224944",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907224944"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "apiVersion": "2022-04-01",
+                            "name": "22fc4278-71f4-4d7b-9a74-d49f93a0505f",
+                            "scope": "microsoft.dashboard/grafana/grafana-20230907224140",
+                            "properties": {
+                                "roleDefinitionId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/microsoft.dashboard/grafana/grafana-20230907224140/providers/Microsoft.Authorization/roleDefinitions/22926164-76b3-42b3-bc55-97df8dab3e41",
+                                "principalId": "5c75deb8-ce21-4235-915a-cb0f7a2042b5"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "AddMRRToGrafMSIForGraf-20230907224944",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907224944"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "apiVersion": "2022-04-01",
+                            "name": "22fc4278-71f4-4d7b-9a74-d49f93a05060",
+                            "properties": {
+                                "roleDefinitionId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/microsoft.dashboard/grafana/grafana-20230907224140/providers/Microsoft.Authorization/roleDefinitions/43d0d8ad-25c7-4714-9337-8ba259a9fe05",
+                                "principalId": "[reference('CreateGrafanaWorkspace-20230907224944').outputs.msiPrincipalId.value]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "AddMonitorDataReaderRoleToGrafanaMSIforAMW-20230907224944",
+            "apiVersion": "2019-05-01",
+            "resourceGroup": "GoPT",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907224944",
+                "Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907224944"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "apiVersion": "2018-09-01-preview",
+                            "name": "22fc4278-71f4-4d7b-9a74-d49f93a05061",
+                            "properties": {
+                                "roleDefinitionId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2/providers/Microsoft.Authorization/roleDefinitions/b0d8363b-8ddd-447d-831f-62ca05bff136",
+                                "principalId": "[reference('CreateGrafanaWorkspace-20230907224944').outputs.msiPrincipalId.value]"
+                            },
+                            "scope": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "AddAMWIntegrationToGrafana-20230907224944",
+            "apiVersion": "2019-05-01",
+            "resourceGroup": "GoPT",
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Dashboard/grafana",
+                            "apiVersion": "2022-08-01",
+                            "location": "eastus2",
+                            "name": "grafana-20230907224140",
+                            "properties": {
+                                "grafanaIntegrations": {
+                                    "azureMonitorWorkspaceIntegrations": [
+                                        {
+                                            "azureMonitorWorkspaceResourceId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.monitor/accounts/defaultazuremonitorworkspace-eus2"
+                                        }
+                                    ]
+                                }
+                            },
+                            "sku": {
+                                "name": "Standard"
+                            }
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))]",
+                "Microsoft.Resources/deployments/AddMonitorDataReaderRoleToGrafanaMSIforAMW-20230907224944"
+            ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "name": "ClusterOnboardingPut-22fc4278-71f4-4d7b-9a74-d49f93a05062",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/CreatePromDCRA-20230907224944",
+                "Microsoft.Resources/deployments/CreatePromRecordingRules-20230907224944"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "location": "eastus2",
+                            "name": "GoPT",
+                            "type": "microsoft.containerservice/managedclusters",
+                            "properties": {
+                                "mode": "Incremental",
+                                "azureMonitorProfile": {
+                                    "metrics": {
+                                        "enabled": true,
+                                        "kubeStateMetrics": {
+                                            "metricLabelsAllowlist": "",
+                                            "metricAnnotationsAllowList": ""
+                                        }
+                                    }
+                                },
+                                "dnsPrefix": "[parameters('dnsPrefix')]",
+                                "agentPoolProfiles": [
+                                    {
+                                        "name": "agentpool",
+                                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                                        "count": 2,
+                                        "enableAutoScaling": true,
+                                        "minCount": 2,
+                                        "maxCount": 5,
+                                        "vmSize": "Standard_D8ds_v5",
+                                        "osType": "Linux",
+                                        "storageProfile": "ManagedDisks",
+                                        "type": "VirtualMachineScaleSets",
+                                        "mode": "System",
+                                        "maxPods": 110,
+                                        "availabilityZones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ],
+                                        "nodeTaints": [
+                                            "CriticalAddonsOnly=true:NoSchedule"
+                                        ],
+                                        "enableNodePublicIP": false,
+                                        "tags": {}
+                                    },
+                                    {
+                                        "name": "userpool",
+                                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                                        "count": 2,
+                                        "enableAutoScaling": true,
+                                        "minCount": 2,
+                                        "maxCount": 100,
+                                        "vmSize": "Standard_D8ds_v5",
+                                        "osType": "Linux",
+                                        "storageProfile": "ManagedDisks",
+                                        "type": "VirtualMachineScaleSets",
+                                        "mode": "User",
+                                        "maxPods": 110,
+                                        "availabilityZones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ],
+                                        "nodeTaints": [],
+                                        "enableNodePublicIP": false,
+                                        "tags": {}
+                                    }
+                                ]
+                            },
+                            "apiVersion": "2023-04-01",
+                            "identity": {
+                                "type": "SystemAssigned"
+                            }
+                        }
+                    ]
+                }
+            },
+            "subscriptionId": "4f52ba89-b806-423c-aa03-f9495c8f046a",
+            "resourceGroup": "GoPT"
+        }
+    ],
+    "outputs": {
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.ContainerService/managedClusters/', parameters('resourceName'))).fqdn]"
+        }
+    }
+}

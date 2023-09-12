@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceName": {
+            "value": "GoPT"
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "dnsPrefix": {
+            "value": "GoPT-dns"
+        },
+        "kubernetesVersion": {
+            "value": "1.26.6"
+        },
+        "networkPlugin": {
+            "value": "azure"
+        },
+        "enableRBAC": {
+            "value": true
+        },
+        "nodeResourceGroup": {
+            "value": "MC_GoPT_GoPT_eastus2"
+        },
+        "upgradeChannel": {
+            "value": "patch"
+        },
+        "adminGroupObjectIDs": {
+            "value": []
+        },
+        "disableLocalAccounts": {
+            "value": false
+        },
+        "azureRbac": {
+            "value": false
+        },
+        "enablePrivateCluster": {
+            "value": false
+        },
+        "enableAzurePolicy": {
+            "value": true
+        },
+        "enableSecretStoreCSIDriver": {
+            "value": true
+        },
+        "vmssNodePool": {
+            "value": true
+        },
+        "workspaceName": {
+            "value": "DefaultWorkspace-4f52ba89-b806-423c-aa03-f9495c8f046a-EUS2"
+        },
+        "omsWorkspaceId": {
+            "value": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/DefaultResourceGroup-EUS2/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4f52ba89-b806-423c-aa03-f9495c8f046a-EUS2"
+        },
+        "workspaceRegion": {
+            "value": "eastus2"
+        },
+        "networkPolicy": {
+            "value": "calico"
+        },
+        "acrName": {
+            "value": "GoPT1"
+        },
+        "acrResourceGroup": {
+            "value": "GoPT"
+        }
+    }
+}

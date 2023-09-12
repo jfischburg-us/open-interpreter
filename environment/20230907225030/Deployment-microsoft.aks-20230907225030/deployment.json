@@ -1,0 +1,358 @@
+{
+  "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/microsoft.aks-20230907225030",
+  "name": "microsoft.aks-20230907225030",
+  "type": "Microsoft.Resources/deployments",
+  "tags": {
+    "primaryResourceId": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourcegroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+    "marketplaceItemId": "microsoft.aks",
+    "provisioningHash": "postCreateId"
+  },
+  "properties": {
+    "templateHash": "16624100264248966424",
+    "parameters": {
+      "resourceName": {
+        "type": "String",
+        "value": "GoPT"
+      },
+      "location": {
+        "type": "String",
+        "value": "eastus2"
+      },
+      "dnsPrefix": {
+        "type": "String",
+        "value": "GoPT-dns"
+      },
+      "osDiskSizeGB": {
+        "type": "Int",
+        "value": 0
+      },
+      "kubernetesVersion": {
+        "type": "String",
+        "value": "1.26.6"
+      },
+      "networkPlugin": {
+        "type": "String",
+        "value": "azure"
+      },
+      "enableRBAC": {
+        "type": "Bool",
+        "value": true
+      },
+      "vmssNodePool": {
+        "type": "Bool",
+        "value": true
+      },
+      "windowsProfile": {
+        "type": "Bool",
+        "value": false
+      },
+      "nodeResourceGroup": {
+        "type": "String",
+        "value": "MC_GoPT_GoPT_eastus2"
+      },
+      "upgradeChannel": {
+        "type": "String",
+        "value": "patch"
+      },
+      "adminGroupObjectIDs": {
+        "type": "Array",
+        "value": []
+      },
+      "azureRbac": {
+        "type": "Bool",
+        "value": false
+      },
+      "disableLocalAccounts": {
+        "type": "Bool",
+        "value": false
+      },
+      "enablePrivateCluster": {
+        "type": "Bool",
+        "value": false
+      },
+      "enableAzurePolicy": {
+        "type": "Bool",
+        "value": true
+      },
+      "enableSecretStoreCSIDriver": {
+        "type": "Bool",
+        "value": true
+      },
+      "enableOmsAgent": {
+        "type": "Bool",
+        "value": true
+      },
+      "workspaceRegion": {
+        "type": "String",
+        "value": "eastus2"
+      },
+      "workspaceName": {
+        "type": "String",
+        "value": "DefaultWorkspace-4f52ba89-b806-423c-aa03-f9495c8f046a-EUS2"
+      },
+      "omsWorkspaceId": {
+        "type": "String",
+        "value": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/DefaultResourceGroup-EUS2/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4f52ba89-b806-423c-aa03-f9495c8f046a-EUS2"
+      },
+      "omsSku": {
+        "type": "String",
+        "value": "standalone"
+      },
+      "acrName": {
+        "type": "String",
+        "value": "GoPT1"
+      },
+      "acrResourceGroup": {
+        "type": "String",
+        "value": "GoPT"
+      },
+      "guidValue": {
+        "type": "String",
+        "value": "bc168510-60ff-4d87-a28b-3d6391a0923c"
+      },
+      "networkPolicy": {
+        "type": "String",
+        "value": "azure"
+      }
+    },
+    "mode": "Incremental",
+    "debugSetting": {
+      "detailLevel": "None"
+    },
+    "provisioningState": "Running",
+    "timestamp": "2023-09-08T02:53:15.2592261Z",
+    "duration": "PT23.7725967S",
+    "correlationId": "9c13c06f-2873-4096-a5b4-9fc2221a4c2d",
+    "providers": [
+      {
+        "namespace": "Microsoft.Resources",
+        "resourceTypes": [
+          {
+            "resourceType": "deployments",
+            "locations": [
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "namespace": "Microsoft.ContainerService",
+        "resourceTypes": [
+          {
+            "resourceType": "managedClusters",
+            "locations": [
+              "eastus2"
+            ]
+          }
+        ]
+      }
+    ],
+    "dependencies": [
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AcrDeployment-22fc4278-71f4-4d7b-9a74-d49f93a050af",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "AcrDeployment-22fc4278-71f4-4d7b-9a74-d49f93a050af"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT",
+            "apiVersion": "2023-04-01"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/ConnectAKStoACR-22fc4278-71f4-4d7b-9a74-d49f93a050ae",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "ConnectAKStoACR-22fc4278-71f4-4d7b-9a74-d49f93a050ae"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/InsightsMetricAlertsDepl-22fc4278-71f4-4d7b-9a74-d49f93a050b1",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "InsightsMetricAlertsDepl-22fc4278-71f4-4d7b-9a74-d49f93a050b1"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCE-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "CreatePromDCE-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCE-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreatePromDCE-20230907225244"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreateAzureMonitorWorkspace-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCR-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "CreatePromDCR-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCR-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreatePromDCR-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCRA-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "CreatePromDCRA-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreateAzureMonitorWorkspace-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromRecordingRules-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "CreatePromRecordingRules-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCE-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreatePromDCE-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "CreateAzureMonitorWorkspace-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "CreateGrafanaWorkspace-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/ClusterMonitoringMetricPulisherRoleAssignmentDepl-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "ClusterMonitoringMetricPulisherRoleAssignmentDepl-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreateGrafanaWorkspace-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AddAdministratorRoleForGrafana-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "AddAdministratorRoleForGrafana-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreateGrafanaWorkspace-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AddMRRToGrafMSIForGraf-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "AddMRRToGrafMSIForGraf-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateAzureMonitorWorkspace-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreateAzureMonitorWorkspace-20230907225244"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreateGrafanaWorkspace-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreateGrafanaWorkspace-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AddMonitorDataReaderRoleToGrafanaMSIforAMW-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "AddMonitorDataReaderRoleToGrafanaMSIforAMW-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.ContainerService/managedClusters/GoPT",
+            "resourceType": "Microsoft.ContainerService/managedClusters",
+            "resourceName": "GoPT"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AddMonitorDataReaderRoleToGrafanaMSIforAMW-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "AddMonitorDataReaderRoleToGrafanaMSIforAMW-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/AddAMWIntegrationToGrafana-20230907225244",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "AddAMWIntegrationToGrafana-20230907225244"
+      },
+      {
+        "dependsOn": [
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromDCRA-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreatePromDCRA-20230907225244"
+          },
+          {
+            "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/CreatePromRecordingRules-20230907225244",
+            "resourceType": "Microsoft.Resources/deployments",
+            "resourceName": "CreatePromRecordingRules-20230907225244"
+          }
+        ],
+        "id": "/subscriptions/4f52ba89-b806-423c-aa03-f9495c8f046a/resourceGroups/GoPT/providers/Microsoft.Resources/deployments/ClusterOnboardingPut-22fc4278-71f4-4d7b-9a74-d49f93a050b5",
+        "resourceType": "Microsoft.Resources/deployments",
+        "resourceName": "ClusterOnboardingPut-22fc4278-71f4-4d7b-9a74-d49f93a050b5"
+      }
+    ],
+    "validationLevel": "Template"
+  }
+}
