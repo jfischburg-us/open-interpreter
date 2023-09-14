@@ -1,0 +1,12 @@
+Progress as of 20230909-2037
+
+Accomplishments:
+- Created resource group: AegisResourceGroup
+- Created storage account: aegisstoragexyz
+- Created data lake store: aegisdatalake
+- Created service principal: DomoServicePrincipal
+- Assigned Storage Blob Data Contributor role to service principal
+
+Next Steps:
+- Configure Domo to access the data lake using the service principal
+- Test the setup
