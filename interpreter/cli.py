@@ -204,7 +204,8 @@ def cli(interpreter):
         if chosen_param is None:
             print("No parameter chosen")
         else:
-            # THIS is more in line with the future. You just say the model you want by name:
+            # THIS is more in line with the future.
+            # You just say the model you want by name:
             interpreter.model = models[chosen_param]
             interpreter.local = True
 

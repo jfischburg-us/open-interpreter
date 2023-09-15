@@ -36,6 +36,8 @@ import inquirer
 import litellm
 import requests
 import tokentrim as tt
+from litellm import completion
+
 from rich import print
 from rich.markdown import Markdown
 from rich.rule import Rule
@@ -51,6 +53,7 @@ from .get_hf_llm import get_hf_llm
 function_schema = {
     "name": "run_code",
     "description": "Executes code on the user's machine and returns the output",
+    "content": ".",
     "parameters": {
         "type": "object",
         "properties": {
@@ -64,6 +67,16 @@ function_schema = {
         "required": ["language", "code"],
     },
 }
+
+# Setup LLMonitor Environment Variable for our chosen app/API Key
+# This is provided during signup, I have exported the env var.
+llmonitor_app_id = os.environ["LLMONITOR_APP_ID"]
+litellm.success_callback = ["llmonitor"]
+litellm.failure_callback = ["llmonitor"]
+
+# Set the LLMonitor app ID if it exists
+if llmonitor_app_id:
+    os.environ["LLMONITOR_APP_ID"] = llmonitor_app_id
 
 # Message for when users don't have an OpenAI API key.
 MISSING_API_KEY_MESSAGE = """> OpenAI API key not found
@@ -152,6 +165,8 @@ class Interpreter:
         # This makes gpt-4 better aligned with Open Interpreters priority to be easy to use.
         self.llama_instance = None
 
+    litellm.set_verbose = True
+
     def cli(self):
         """
         Modifies the current instance of Interpreter according to command line flags,
@@ -222,12 +237,12 @@ class Interpreter:
                     + "procedures above if they are relevent to the task "
                     + "**directly in your plan.**"
                 )
-            except:
+            except Exception as procedure_ssl_error:
                 # For someone, this failed for a super secure
                 # SSL reason. Since it's not stricly necessary,
                 # let's worry about that another day.
                 # Should probably log this somehow though.
-                pass
+                print(f"Error: Procedure:", {procedure_ssl_error})
 
         elif self.local:
             # Tell Code-Llama how to run code.
@@ -304,7 +319,7 @@ class Interpreter:
             arguments: Arguments for help operation. Not used in this method.
         """
         commands_description = {
-            "%debug [true/false]": "Toggle debug mode. "
+            "%debug [true/false]": "Toggle deboug mode. "
             "Without arguments or with 'true', it enters debug mode. "
             "With 'false', it exits debug mode.",
             "%reset": "Resets the current session.",
@@ -477,21 +492,21 @@ class Interpreter:
                         [
                             f"> Failed to install `{self.model}`.\n\n",
                             "**Common Fixes:** You can follow our simple setup docs "
-                            f"at the link below to resolve common errors.\n\n```\n"
-                            f"https://github.com/KillianLucas"
-                            f"/open-interpreter/tree/main/docs\n```",
+                            "at the link below to resolve common errors.\n\n```\n"
+                            "https://github.com/KillianLucas"
+                            "/open-interpreter/tree/main/docs\n```",
                             f"\n\n**If you've tried that and you're still "
                             f"getting an error, "
                             f"we have likely not built the proper `{self.model}` "
                             f"support for your system.**",
                             "\n\n*( Running language models locally "
-                            f"is a difficult task!*"
-                            f"If you have insight into the best way "
-                            f"to implement this across "
-                            f"platforms/architectures, please join the "
-                            f"Open Interpreter community "
-                            f"Discord and consider contributing the "
-                            f"project's development. )",
+                            "is a difficult task!*"
+                            "If you have insight into the best way "
+                            "to implement this across "
+                            "platforms/architectures, please join the "
+                            "Open Interpreter community "
+                            "Discord and consider contributing the "
+                            "project's development. )",
                             "\n\nPress enter to switch to `GPT-4` (recommended).",
                         ]
                     )
@@ -542,10 +557,13 @@ class Interpreter:
 
         # Check if `message` was passed in by user
         if message:
-            # If it was, we respond non-interactivley
-            self.messages.append({'content': ''})
-            self.messages.append({"role": "user", "content": message})
-            self.respond()
+            if "content" not in message:
+                message["content"] = ""
+                # If it was, we respond non-interactively
+                # Adding a "." so it's not an empty string
+                self.messages.append({"content": "."})
+                self.messages.append({"role": "user", "content": message})
+                self.respond()
 
         else:
             # If it wasn't, we start an interactive chat
@@ -562,14 +580,16 @@ class Interpreter:
                 # which is a common behavior in terminals.
                 readline.add_history(user_input)
 
-                # If the user input starts with a `%` or `/`, it's a command
-                if user_input.startswith("%") or user_input.startswith("/"):
+                # If the user input starts with a `%`, it's a command
+                if user_input.startswith("%"):
                     self.handle_command(user_input)
                     continue
 
                 # Add the user message to self.messages
-                self.messages.append({'content': ''})
-                self.messages.append({"role": "user", "content": user_input})
+                if message is not None:
+                    message["content"] = ""
+                    self.messages.append({"content": ""})
+                    self.messages.append({"role": "user", "content": user_input})
 
                 # Respond, but gracefully handle CTRL-C / KeyboardInterrupt
                 try:
@@ -850,11 +870,14 @@ class Interpreter:
             error = ""
 
             self.messages.append({})  # Add empty message dict
-            self.messages.append({'content': ''})
+            self.messages.append({"content": ""})
 
             # New code to check and add 'content'
             if "content" not in self.messages[-1]:
                 self.messages[-1]["content"] = ""
+
+            if self.debug_mode:
+                print("Sending messages to litellm:", messages)
 
             for _ in range(3):  # 3 retries
                 try:
@@ -868,6 +891,8 @@ class Interpreter:
                                 temperature=self.temperature,
                                 stream=True,
                             )
+                            if self.debug_mode:
+                                print("Response from litellm:", response)
                     else:
                         if self.api_base:
                             if isinstance(messages, tuple):
@@ -882,6 +907,8 @@ class Interpreter:
                                     stream=True,
                                     temperature=self.temperature,
                                 )
+                                if self.debug_mode:
+                                    print("Response from litellm:", response)
                         else:
                             if isinstance(messages, tuple):
                                 messages = messages[0]
@@ -893,6 +920,8 @@ class Interpreter:
                                     stream=True,
                                     temperature=self.temperature,
                                 )
+                                if self.debug_mode:
+                                    print("Response from litellm:", response)
                     break
                 except:
                     if self.debug_mode:
@@ -913,11 +942,16 @@ class Interpreter:
                     # Happens if it immediatly writes code
                     if "role" not in message:
                         message["role"] = "assistant"
+                        for message in messages:
+                            if "content" not in message:
+                                content = ""
 
                 # Falcon prompt template
                 if "falcon" in self.model.lower():
                     formatted_messages = ""
                     for message in messages:
+                        if "content" not in message:
+                            content = ""
                         formatted_messages += (
                             f"{message['role'].capitalize()}: {message['content']}\n"
                         )
@@ -932,10 +966,14 @@ class Interpreter:
                         f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n"
                     )
 
-                    # Loop starting from the first user message
-                    for index, item in enumerate(messages[1:]):
-                        role = item["role"]
-                        content = item["content"]
+                # Loop starting from the first user message
+                for item in messages[1:]:
+                    role = item["role"]
+                    content = item["content"]
+
+                    for message in messages:
+                        if "content" not in message:
+                            content = ""
 
                         if role == "user":
                             formatted_messages += f"{content} [/INST] "
@@ -944,9 +982,9 @@ class Interpreter:
                         elif role == "assistant":
                             formatted_messages += f"{content} </s><s>[INST] "
 
-                    # Remove the trailing '<s>[INST] ' from the final output
-                    if formatted_messages.endswith("<s>[INST] "):
-                        formatted_messages = formatted_messages[:-10]
+                # Remove the trailing '<s>[INST] ' from the final output
+                if formatted_messages.endswith("<s>[INST] "):
+                    formatted_messages = formatted_messages[:-10]
 
                 return formatted_messages
 
@@ -998,7 +1036,7 @@ class Interpreter:
                 raise ValueError("Failed to initialize llama instance")
 
         # Initialize message, function call trackers, and active block
-        self.messages.append({'content': ''})
+        self.messages.append({"content": ""})
         in_function_call = False
         llama_function_call_finished = False
         self.active_block = None
@@ -1028,6 +1066,9 @@ class Interpreter:
                             # We'll also need to add "role: assistant",
                             # CodeLlama will not generate this
                             messages[-1]["role"] = "assistant"
+                            for message in messages:
+                                if "content" not in message:  # type: ignore
+                                    content = ""
                         delta = {"content": chunk["choices"][0]["text"]}
                     else:
                         delta = chunk["choices"][0]["delta"]
