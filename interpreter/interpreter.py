@@ -543,6 +543,7 @@ class Interpreter:
         # Check if `message` was passed in by user
         if message:
             # If it was, we respond non-interactivley
+            self.messages.append({'content': ''})
             self.messages.append({"role": "user", "content": message})
             self.respond()
 
@@ -567,6 +568,7 @@ class Interpreter:
                     continue
 
                 # Add the user message to self.messages
+                self.messages.append({'content': ''})
                 self.messages.append({"role": "user", "content": user_input})
 
                 # Respond, but gracefully handle CTRL-C / KeyboardInterrupt
@@ -847,6 +849,13 @@ class Interpreter:
 
             error = ""
 
+            self.messages.append({})  # Add empty message dict
+            self.messages.append({'content': ''})
+
+            # New code to check and add 'content'
+            if "content" not in self.messages[-1]:
+                self.messages[-1]["content"] = ""
+
             for _ in range(3):  # 3 retries
                 try:
                     if self.use_azure:
@@ -989,7 +998,7 @@ class Interpreter:
                 raise ValueError("Failed to initialize llama instance")
 
         # Initialize message, function call trackers, and active block
-        self.messages.append({})
+        self.messages.append({'content': ''})
         in_function_call = False
         llama_function_call_finished = False
         self.active_block = None
@@ -1027,6 +1036,11 @@ class Interpreter:
 
                 # Accumulate deltas into the last message in messages
                 self.messages[-1] = merge_deltas(self.messages[-1], delta)
+
+                # Check if 'content' exists in the updated message
+                if "content" not in self.messages[-1]:
+                    # If not, initialize it with an empty string
+                    self.messages[-1]["content"] = ""
 
                 # Check if we're in a function call
                 if not self.local:

@@ -8,7 +8,6 @@ to highlight code syntax, handle code execution, and display code outputs.
 Key Components:
 
 - CodeBlock: Main class for displaying and managing code and outputs.
-
 """
 from rich.live import Live
 from rich.panel import Panel
@@ -46,7 +45,6 @@ class CodeBlock:
 
     Note:
         This class is intended for interactive code presentation and execution.
-
     """
 
     def __init__(self):
@@ -96,7 +94,6 @@ class CodeBlock:
 
         Returns:
             None
-
         """
         self.refresh(cursor=False)
         # Destroys live display
@@ -111,7 +108,6 @@ class CodeBlock:
 
         Returns:
             None
-
         """
         # Get code, return if there is none
         code = self.code
