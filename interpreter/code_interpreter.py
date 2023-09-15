@@ -115,6 +115,10 @@ class CodeInterpreter:
         self.active_line = None
         self.debug_mode = debug_mode
         self.active_block: Optional[CodeBlock] = None
+        self.output = None
+        self.code = None
+        self.print_cmd = None
+        self.done = None
 
     def start_process(self):
         """
@@ -155,7 +159,7 @@ class CodeInterpreter:
         self.output = truncate_output(self.output)
 
         # Display it
-        if self.active_block is not None:
+        if self.active_block is not None and self.output is not None:
             self.active_block.active_line = self.active_line
             self.active_block.output = self.output
             self.active_block.refresh()
@@ -173,14 +177,13 @@ class CodeInterpreter:
             self.code = self.active_block.code
 
         # Check for forbidden commands (disabled)
-        """
-    for line in self.code.split("\n"):
-      if line in forbidden_commands:
-        message = f"This code contains a forbidden command: {line}"
-        message += "\n\nPlease contact the Open Interpreter team if this is an error."
-        self.active_block.output = message
-        return message
-    """
+
+        # for line in self.code.split("\n"):
+        # if line in forbidden_commands:
+        #     message = f"This code contains a forbidden command: {line}"
+        #     message += "\n\nPlease contact the Open Interpreter team if this is an error."
+        #     self.active_block.output = message
+        #     return message
 
         # Should we keep a subprocess open? True by default
         open_subprocess = language_map[self.language].get("open_subprocess", True)
@@ -189,7 +192,7 @@ class CodeInterpreter:
         if not self.proc and open_subprocess:
             try:
                 self.start_process()
-            except:
+            except Exception:
                 # Sometimes start_process will fail!
                 # Like if they don't have `node` installed or something.
 
@@ -214,7 +217,7 @@ class CodeInterpreter:
         if self.print_cmd:
             try:
                 code = self.add_active_line_prints(code)
-            except:
+            except Exception:
                 # If this failed, it means the code didn't compile
                 # This traceback will be our output.
 
@@ -237,9 +240,10 @@ class CodeInterpreter:
 
         # Remove any whitespace lines, as this will break indented blocks
         # (are we sure about this? test this)
-        code_lines = code.split("\n")
-        code_lines = [c for c in code_lines if c.strip() != ""]
-        code = "\n".join(code_lines)
+        if code is not None:
+            code_lines = code.split("\n")
+            code_lines = [c for c in code_lines if c.strip() != ""]
+            code = "\n".join(code_lines)
 
         # Add end command (we'll be listening for this so we know when it ends)
         if self.print_cmd and self.language != "applescript":  # Applescript is special.
@@ -248,7 +252,7 @@ class CodeInterpreter:
             code += "\n\n" + self.print_cmd.format("END_OF_EXECUTION")
 
         # Applescript-specific processing
-        if self.language == "applescript":
+        if self.language == "applescript" and code is not None:
             # Escape double quotes
             code = code.replace('"', r"\"")
             # Wrap in double quotes
@@ -352,12 +356,13 @@ class CodeInterpreter:
 
             # Format the print command with the current line number,
             # using the found leading whitespace
-            print_line = self.print_cmd.format(f"ACTIVE_LINE:{i+1}")
-            print_line = leading_whitespace + print_line
+            if self.print_cmd is not None:
+                print_line = self.print_cmd.format(f"ACTIVE_LINE:{i+1}")
+                print_line = leading_whitespace + print_line
 
-            # Add the print command and the original line to the modified lines
-            modified_code_lines.append(print_line)
-            modified_code_lines.append(line)
+                # Add the print command and the original line to the modified lines
+                modified_code_lines.append(print_line)
+                modified_code_lines.append(line)
 
         # Join the modified lines with newlines and return the result
         code = "\n".join(modified_code_lines)
@@ -405,10 +410,14 @@ class CodeInterpreter:
             # Or if we should save it to self.output
             if line.startswith("ACTIVE_LINE:"):
                 self.active_line = int(line.split(":")[1])
-            elif "END_OF_EXECUTION" in line:
+            elif "END_OF_EXECUTION" in line and self.done is not None:
                 self.done.set()
                 self.active_line = None
-            elif self.language == "R" and "Execution halted" in line:
+            elif (
+                self.language == "R"
+                and self.done is not None
+                and "Execution halted" in line
+            ):
                 # We need to figure out how to wrap R code in a try:
                 # except: block so we don't have to do this.
                 self.done.set()
@@ -416,8 +425,9 @@ class CodeInterpreter:
             elif is_error_stream and "KeyboardInterrupt" in line:
                 raise KeyboardInterrupt
             else:
-                self.output += "\n" + line
-                self.output = self.output.strip()
+                if self.output is not None:
+                    self.output += "\n" + line
+                    self.output = self.output.strip()
 
             self.update_active_block()
 

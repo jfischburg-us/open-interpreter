@@ -9,6 +9,8 @@ Key Components:
 
 - CodeBlock: Main class for displaying and managing code and outputs.
 """
+from typing import Optional
+
 from rich.live import Live
 from rich.panel import Panel
 from rich.box import MINIMAL
@@ -55,7 +57,7 @@ class CodeBlock:
         self.language = ""
         self.output = ""
         self.code = ""
-        self.active_line = None
+        self.active_line: Optional[int] = None
 
         self.live = Live(
             auto_refresh=False, console=Console(), vertical_overflow="visible"
